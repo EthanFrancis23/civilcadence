@@ -24,7 +24,7 @@ export function decodePlan(encoded: string): PlanState | null {
     const json = fromBase64url(encoded);
     const obj = JSON.parse(json);
     if (obj.v !== 1) return null;
-    if (typeof obj.examDate !== 'string' || typeof obj.startDate !== 'string') return null;
+    if ((obj.examDate !== null && typeof obj.examDate !== 'string') || typeof obj.startDate !== 'string') return null;
     if (!obj.confidence || typeof obj.confidence !== 'object') return null;
     for (const topic of FE_CIVIL_TOPICS) {
       const c = obj.confidence[topic.id];

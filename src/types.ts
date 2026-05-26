@@ -4,7 +4,7 @@ export type Confidence = 1 | 2 | 3 | 4 | 5;
 
 export type PlanState = {
   v: 1;
-  examDate: string;
+  examDate: string | null;
   startDate: string;
   minDays: number;
   exponent: number;

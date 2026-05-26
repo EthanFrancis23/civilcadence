@@ -41,7 +41,9 @@ export default function App() {
   }));
 
   const availableDates = useMemo(
-    () => calculateAvailableDates(state.startDate, state.examDate, Array.from(state.blockedWeekdays), state.blockedDates),
+    () => state.examDate
+      ? calculateAvailableDates(state.startDate, state.examDate, Array.from(state.blockedWeekdays), state.blockedDates)
+      : [],
     [state.startDate, state.examDate, state.blockedWeekdays, state.blockedDates]
   );
 
@@ -57,8 +59,8 @@ export default function App() {
     [allocations, availableDates]
   );
 
-  const totalCalendarDays = daysBetween(state.startDate, state.examDate);
-  const examInDays = daysBetween(todayISO(), state.examDate);
+  const totalCalendarDays = state.examDate ? daysBetween(state.startDate, state.examDate) : 0;
+  const examInDays = state.examDate ? daysBetween(todayISO(), state.examDate) : null;
 
   return (
     <div className="min-h-screen">
@@ -67,6 +69,7 @@ export default function App() {
         examInDays={examInDays}
         availableDays={availableDates.length}
         totalCalendarDays={totalCalendarDays}
+        hasExamDate={state.examDate !== null}
       />
       <Nav active={state.activeTab} onChange={t => update({ activeTab: t })} />
       <main className="max-w-6xl mx-auto px-4 sm:px-6 pb-24">
@@ -74,7 +77,13 @@ export default function App() {
           <SetupTab state={state} update={update} availableCount={availableDates.length} />
         )}
         {state.activeTab === 'schedule' && (
-          <ScheduleTab state={state} schedule={schedule} availableDates={availableDates} allocations={allocations} />
+          <ScheduleTab
+            state={state}
+            schedule={schedule}
+            availableDates={availableDates}
+            allocations={allocations}
+            onSwitchToSetup={() => update({ activeTab: 'setup' })}
+          />
         )}
         {state.activeTab === 'allocation' && (
           <AllocationTab
@@ -86,6 +95,8 @@ export default function App() {
             totalCalendarDays={totalCalendarDays}
             minDays={state.minDays}
             exponent={state.exponent}
+            hasExamDate={state.examDate !== null}
+            onSwitchToSetup={() => update({ activeTab: 'setup' })}
           />
         )}
       </main>

@@ -12,6 +12,8 @@ interface Props {
   totalCalendarDays: number;
   minDays: number;
   exponent: number;
+  hasExamDate: boolean;
+  onSwitchToSetup: () => void;
 }
 
 function ComputeStep({ label, value, unit, note, accent }: { label: string; value: number; unit: string; note: string; accent?: boolean }) {
@@ -27,7 +29,21 @@ function ComputeStep({ label, value, unit, note, accent }: { label: string; valu
   );
 }
 
-export function AllocationTab({ confidence, allocations, availableDays, blockedDates, blockedWeekdays, totalCalendarDays, minDays, exponent }: Props) {
+export function AllocationTab({ confidence, allocations, availableDays, blockedDates, blockedWeekdays, totalCalendarDays, minDays, exponent, hasExamDate, onSwitchToSetup }: Props) {
+  if (!hasExamDate) {
+    return (
+      <div className="pt-20 pb-24 flex flex-col items-center text-center anim-in">
+        <div className="font-display text-3xl font-medium mb-4 text-[var(--ink)]">No plan yet</div>
+        <p className="text-[var(--ink-2)] text-sm mb-8 max-w-sm">
+          Pick your exam date on the Configure tab to generate your study schedule.
+        </p>
+        <button className="btn btn-accent" onClick={onSwitchToSetup}>
+          Go to Configure →
+        </button>
+      </div>
+    );
+  }
+
   const totalAllocated = allocations.reduce((a, b) => a + b, 0);
   const maxAllocation = Math.max(...allocations, 1);
 
@@ -44,10 +60,7 @@ export function AllocationTab({ confidence, allocations, availableDays, blockedD
   return (
     <div className="space-y-12 pt-10 anim-in">
       <section>
-        <div className="flex items-baseline gap-6 mb-2">
-          <span className="font-mono text-[11px] tracked-wide uppercase text-[var(--accent)]">Distribution</span>
-          <div className="flex-1 h-px bg-[var(--rule)]" />
-        </div>
+        <div className="h-px bg-[var(--rule)] mb-4" />
         <h2 className="font-display text-3xl font-medium mb-6">Time per topic</h2>
         <div className="card p-6">
           {sorted.map(({ topic, index, days, conf, color }) => (
@@ -76,10 +89,7 @@ export function AllocationTab({ confidence, allocations, availableDays, blockedD
       </section>
 
       <section>
-        <div className="flex items-baseline gap-6 mb-2">
-          <span className="font-mono text-[11px] tracked-wide uppercase text-[var(--accent)]">Summary</span>
-          <div className="flex-1 h-px bg-[var(--rule)]" />
-        </div>
+        <div className="h-px bg-[var(--rule)] mb-4" />
         <h2 className="font-display text-3xl font-medium mb-6">Days · weeks · months</h2>
 
         <div className="card overflow-hidden allocation-table-desktop overflow-x-auto">
@@ -154,10 +164,7 @@ export function AllocationTab({ confidence, allocations, availableDays, blockedD
       </section>
 
       <section>
-        <div className="flex items-baseline gap-6 mb-2">
-          <span className="font-mono text-[11px] tracked-wide uppercase text-[var(--accent)]">Timeline</span>
-          <div className="flex-1 h-px bg-[var(--rule)]" />
-        </div>
+        <div className="h-px bg-[var(--rule)] mb-4" />
         <h2 className="font-display text-3xl font-medium mb-4">How the schedule was computed</h2>
         <div className="card-flat p-4 mb-6 font-mono text-[11px] text-[var(--ink-2)] leading-relaxed">
           <strong>Weight formula:</strong> weight = qMid × (6 − confidence)^{exponent}<br/>

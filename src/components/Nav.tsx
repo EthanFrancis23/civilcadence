@@ -4,9 +4,9 @@ interface Props {
 }
 
 const TABS = [
-  { id: 'setup' as const, label: '01 · Configure' },
-  { id: 'schedule' as const, label: '02 · Schedule' },
-  { id: 'allocation' as const, label: '03 · Allocation' },
+  { id: 'setup' as const, label: 'Configure' },
+  { id: 'schedule' as const, label: 'Schedule' },
+  { id: 'allocation' as const, label: 'Allocation' },
 ];
 
 export function Nav({ active, onChange }: Props) {

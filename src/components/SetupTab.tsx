@@ -11,13 +11,10 @@ const CONF_LABELS: Record<number, string> = {
   1: 'No clue', 2: 'Seen it before', 3: 'Mostly remember', 4: 'Can solve most', 5: 'No studying needed',
 };
 
-function Section({ number, title, description, children }: { number: string; title: string; description: string; children: ReactNode }) {
+function Section({ title, description, children }: { title: string; description: string; children: ReactNode }) {
   return (
     <section>
-      <div className="flex items-baseline gap-6 mb-2">
-        <span className="font-mono text-[11px] tracked-wide uppercase text-[var(--accent)]">Part {number}</span>
-        <div className="flex-1 h-px bg-[var(--rule)]" />
-      </div>
+      <div className="h-px bg-[var(--rule)] mb-4" />
       <h2 className="font-display text-3xl font-medium mb-2">{title}</h2>
       <p className="text-[var(--ink-2)] text-sm mb-8 max-w-2xl">{description}</p>
       {children}
@@ -64,14 +61,14 @@ export function SetupTab({ state, update, availableCount }: Props) {
 
   return (
     <div className="space-y-12 pt-10 anim-in">
-      <Section number="A" title="Exam configuration" description="Set when you'll take the exam and when your prep window begins.">
+      <Section title="Exam configuration" description="Set when you'll take the exam and when your prep window begins.">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Field label="Exam date">
-            <input type="date" value={state.examDate} min={state.startDate}
-              onChange={e => update({ examDate: e.target.value })} className="w-full" />
+            <input type="date" value={state.examDate ?? ''} min={state.startDate}
+              onChange={e => update({ examDate: e.target.value || null })} className="w-full" />
           </Field>
           <Field label="Start studying">
-            <input type="date" value={state.startDate} max={state.examDate}
+            <input type="date" value={state.startDate} max={state.examDate ?? undefined}
               onChange={e => update({ startDate: e.target.value })} className="w-full" />
           </Field>
         </div>
@@ -92,7 +89,7 @@ export function SetupTab({ state, update, availableCount }: Props) {
         </details>
       </Section>
 
-      <Section number="B" title="Knowledge areas" description="Rate your confidence in each topic. Weaker topics — and those with more exam questions — receive proportionally more study time.">
+      <Section title="Knowledge areas" description="Rate your confidence in each topic. Weaker topics — and those with more exam questions — receive proportionally more study time.">
         <ConfidenceLegend />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-1 mt-6">
           {FE_CIVIL_TOPICS.map((topic, i) => (
@@ -107,7 +104,7 @@ export function SetupTab({ state, update, availableCount }: Props) {
         </div>
       </Section>
 
-      <Section number="C" title="Availability" description="Mark recurring days off and specific dates you can't study. The schedule recomputes automatically.">
+      <Section title="Availability" description="Mark recurring days off and specific dates you can't study. The schedule recomputes automatically.">
         <div className="font-mono text-[11px] tracked-wide uppercase text-[var(--ink-3)] mb-3">
           Recurring days off
         </div>
@@ -134,7 +131,7 @@ export function SetupTab({ state, update, availableCount }: Props) {
           blockedDates={state.blockedDates}
           onChange={dates => update({ blockedDates: dates })}
           minDate={state.startDate}
-          maxDate={state.examDate}
+          maxDate={state.examDate ?? undefined}
         />
       </Section>
 
@@ -142,10 +139,17 @@ export function SetupTab({ state, update, availableCount }: Props) {
         <div>
           <div className="font-mono text-[10px] tracked-wide uppercase text-[var(--ink-3)] mb-1">Ready</div>
           <div className="font-display text-2xl">
-            {availableCount} days allocated across 14 topics
+            {state.examDate
+              ? `${availableCount} days allocated across 14 topics`
+              : 'Set an exam date to generate your schedule'}
           </div>
         </div>
-        <button className="btn btn-accent" onClick={() => update({ activeTab: 'schedule' })}>
+        <button
+          className="btn btn-accent"
+          disabled={!state.examDate}
+          onClick={() => update({ activeTab: 'schedule' })}
+          style={!state.examDate ? { opacity: 0.4, cursor: 'not-allowed' } : undefined}
+        >
           View schedule →
         </button>
       </div>

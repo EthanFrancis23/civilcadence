@@ -31,11 +31,26 @@ interface Props {
   schedule: Schedule;
   availableDates: string[];
   allocations: number[];
+  onSwitchToSetup: () => void;
 }
 
-export function ScheduleTab({ state, schedule, availableDates, allocations }: Props) {
+export function ScheduleTab({ state, schedule, availableDates, allocations, onSwitchToSetup }: Props) {
   const today = todayISO();
   const [showShare, setShowShare] = useState(false);
+
+  if (!state.examDate) {
+    return (
+      <div className="pt-20 pb-24 flex flex-col items-center text-center anim-in">
+        <div className="font-display text-3xl font-medium mb-4 text-[var(--ink)]">No plan yet</div>
+        <p className="text-[var(--ink-2)] text-sm mb-8 max-w-sm">
+          Pick your exam date on the Configure tab to generate your study schedule.
+        </p>
+        <button className="btn btn-accent" onClick={onSwitchToSetup}>
+          Go to Configure →
+        </button>
+      </div>
+    );
+  }
 
   const upcoming = availableDates.filter(d => d >= today).slice(0, 7);
 
@@ -59,10 +74,7 @@ export function ScheduleTab({ state, schedule, availableDates, allocations }: Pr
   return (
     <div className="space-y-12 pt-10 anim-in">
       <section>
-        <div className="flex items-baseline gap-6 mb-2">
-          <span className="font-mono text-[11px] tracked-wide uppercase text-[var(--accent)]">Up next</span>
-          <div className="flex-1 h-px bg-[var(--rule)]" />
-        </div>
+        <div className="h-px bg-[var(--rule)] mb-4" />
         <h2 className="font-display text-3xl font-medium mb-6">The next seven study sessions</h2>
 
         <div className="flex gap-3 mb-6 flex-wrap no-print">
@@ -112,10 +124,7 @@ export function ScheduleTab({ state, schedule, availableDates, allocations }: Pr
       </section>
 
       <section>
-        <div className="flex items-baseline gap-6 mb-2">
-          <span className="font-mono text-[11px] tracked-wide uppercase text-[var(--accent)]">Calendar</span>
-          <div className="flex-1 h-px bg-[var(--rule)]" />
-        </div>
+        <div className="h-px bg-[var(--rule)] mb-4" />
         <h2 className="font-display text-3xl font-medium mb-6">Full study plan</h2>
         <TopicLegend allocations={allocations} />
         <div className="space-y-10 mt-8">
@@ -128,7 +137,7 @@ export function ScheduleTab({ state, schedule, availableDates, allocations }: Pr
               blockedWeekdays={Array.from(state.blockedWeekdays)}
               blockedDates={state.blockedDates}
               startDate={state.startDate}
-              examDate={state.examDate}
+              examDate={state.examDate!}
               today={today}
             />
           ))}

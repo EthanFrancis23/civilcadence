@@ -1,10 +1,11 @@
 import { fromISO } from '../lib/dates';
 
 interface Props {
-  examDate: string;
-  examInDays: number;
+  examDate: string | null;
+  examInDays: number | null;
   availableDays: number;
   totalCalendarDays: number;
+  hasExamDate: boolean;
 }
 
 function StatBlock({ label, value }: { label: string; value: string | number }) {
@@ -17,11 +18,12 @@ function StatBlock({ label, value }: { label: string; value: string | number }) 
   );
 }
 
-export function Header({ examDate, examInDays, availableDays, totalCalendarDays }: Props) {
-  const examDateObj = fromISO(examDate);
-  const examFmt = examDateObj.toLocaleDateString('en-US', {
-    weekday: 'long', month: 'long', day: 'numeric', year: 'numeric',
-  });
+export function Header({ examDate, examInDays, availableDays, totalCalendarDays, hasExamDate }: Props) {
+  const examFmt = examDate
+    ? fromISO(examDate).toLocaleDateString('en-US', {
+        weekday: 'long', month: 'long', day: 'numeric', year: 'numeric',
+      })
+    : null;
 
   return (
     <header className="border-b border-stone-300/60 bg-[var(--paper-2)]/40 backdrop-blur-sm">
@@ -39,18 +41,26 @@ export function Header({ examDate, examInDays, availableDays, totalCalendarDays 
             <div className="font-mono text-[10px] tracked-wide uppercase text-[var(--ink-3)] mb-2">
               Days until exam
             </div>
-            <div className="font-display text-6xl md:text-7xl font-medium leading-none tabular-nums">
-              {examInDays >= 0 ? examInDays : '—'}
-            </div>
-            <div className="font-mono text-[11px] text-[var(--ink-2)] mt-2">{examFmt}</div>
+            {hasExamDate ? (
+              <>
+                <div className="font-display text-6xl md:text-7xl font-medium leading-none tabular-nums">
+                  {examInDays !== null && examInDays >= 0 ? examInDays : '—'}
+                </div>
+                <div className="font-mono text-[11px] text-[var(--ink-2)] mt-2">{examFmt}</div>
+              </>
+            ) : (
+              <div className="font-display text-2xl font-medium text-[var(--ink-3)] mt-1">
+                Set your exam date below ↓
+              </div>
+            )}
           </div>
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-px mt-10 bg-[var(--rule)] border border-[var(--rule)]">
-          <StatBlock label="Available study days" value={availableDays} />
-          <StatBlock label="Calendar days remaining" value={Math.max(0, totalCalendarDays)} />
-          <StatBlock label="Weeks" value={(availableDays / 7).toFixed(1)} />
-          <StatBlock label="Knowledge areas" value={14} />
+          <StatBlock label="Available study days" value={hasExamDate ? availableDays : '—'} />
+          <StatBlock label="Calendar days remaining" value={hasExamDate ? Math.max(0, totalCalendarDays) : '—'} />
+          <StatBlock label="Weeks" value={hasExamDate ? (availableDays / 7).toFixed(1) : '—'} />
+          <StatBlock label="Knowledge areas" value={hasExamDate ? 14 : '—'} />
         </div>
       </div>
     </header>

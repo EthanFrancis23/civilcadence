@@ -5,7 +5,7 @@ interface Props {
   blockedDates: string[];
   onChange: (dates: string[]) => void;
   minDate: string;
-  maxDate: string;
+  maxDate?: string;
 }
 
 export function BlockedDatesEditor({ blockedDates, onChange, minDate, maxDate }: Props) {

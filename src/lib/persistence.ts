@@ -1,20 +1,19 @@
 import { FE_CIVIL_TOPICS } from '../constants/feCivilTopics';
 import type { TopicId } from '../constants/feCivilTopics';
 import type { PlanState, Confidence } from '../types';
-import { toISO, addDays } from './dates';
+import { toISO } from './dates';
 
 const STORAGE_KEY = 'civilcadence-v1';
 
 export function defaultState(): PlanState {
   const today = toISO(new Date());
-  const examDate = addDays(today, 180);
   const confidence = Object.fromEntries(
     FE_CIVIL_TOPICS.map(t => [t.id, 3 as Confidence])
   ) as Record<TopicId, Confidence>;
 
   return {
     v: 1,
-    examDate,
+    examDate: null,
     startDate: today,
     minDays: 2,
     exponent: 2,
